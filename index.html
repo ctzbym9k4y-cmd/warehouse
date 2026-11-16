@@ -1,0 +1,36 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Warehouse Picking</title>
+  <style>
+    body {
+      margin: 0;
+      background: #17191b;
+      color: #f5f7fa;
+      font-family: Arial, sans-serif;
+      display: grid;
+      place-items: center;
+      min-height: 100vh;
+      text-align: center;
+    }
+    a { color: #8fc6ff; }
+  </style>
+</head>
+<body>
+  <main>
+    <h2>Strategic Mechanical</h2>
+    <p>Opening Warehouse Picking...</p>
+    <p><a id="open" href="#">Open Warehouse</a></p>
+  </main>
+  <script>
+    const warehouseUrl =
+      "https://relates-allow-animals-james.trycloudflare.com";
+
+    document.getElementById("open").href = warehouseUrl;
+    window.location.replace(warehouseUrl);
+  </script>
+</body>
+</html>
