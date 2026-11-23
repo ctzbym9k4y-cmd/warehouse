@@ -1,36 +1,63 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta name="theme-color" content="#17191b">
   <title>Warehouse Picking</title>
   <style>
-    body {
-      margin: 0;
-      background: #17191b;
-      color: #f5f7fa;
-      font-family: Arial, sans-serif;
-      display: grid;
-      place-items: center;
-      min-height: 100vh;
-      text-align: center;
-    }
-    a { color: #8fc6ff; }
+    body { margin:0; background:#17191b; color:#f5f7fa; font-family:Arial,sans-serif; min-height:100vh; display:grid; place-items:center; text-align:center; }
+    main { padding:28px; max-width:390px; }
+    p { color:#b9c2cc; line-height:1.5; }
+    button, a { color:#8fc6ff; }
+    button { border:1px solid #526779; background:#252a30; border-radius:8px; padding:12px 24px; cursor:pointer; font-size:16px; }
+    a { display:inline-block; margin-top:18px; }
   </style>
 </head>
 <body>
   <main>
     <h2>Strategic Mechanical</h2>
-    <p>Opening Warehouse Picking...</p>
-    <p><a id="open" href="#">Open Warehouse</a></p>
+    <p id="status" role="status">Connecting to Warehouse Picking...</p>
+    <button id="retry" type="button" hidden>Retry Connection</button>
+    <p><a id="open" hidden href="#">Open Warehouse</a></p>
   </main>
   <script>
-    const warehouseUrl =
-      "https://stocks-conf-thrown-plus.trycloudflare.com";
+    // This assignment is intentionally retained for the existing PowerShell updater.
+    const warehouseUrl = "https://stocks-conf-thrown-plus.trycloudflare.com";
+    const source = 'https://raw.githubusercontent.com/ctzbym9k4y-cmd/warehouse/main/index.html';
+    const status = document.getElementById('status');
+    const retry = document.getElementById('retry');
+    const open = document.getElementById('open');
+    let busy = false;
 
-    document.getElementById("open").href = warehouseUrl;
-    window.location.replace(warehouseUrl);
+    async function connect() {
+      if (busy) return;
+      busy = true;
+      retry.hidden = true;
+      open.hidden = true;
+      status.textContent = 'Checking the latest warehouse connection...';
+      try {
+        // Read the current repository file, not this potentially cached GitHub Pages copy.
+        const response = await fetch(source + '?fresh=' + Date.now(), { cache: 'no-store' });
+        if (!response.ok) throw new Error('Could not check current address');
+        const html = await response.text();
+        const match = html.match(/const\s+warehouseUrl\s*=\s*["'](https:\/\/[a-z0-9-]+\.trycloudflare\.com)["']/i);
+        if (!match) throw new Error('No current tunnel address found');
+        const current = match[1];
+        open.href = current;
+        open.hidden = false;
+        status.textContent = 'Opening Warehouse Picking...';
+        window.location.replace(current);
+      } catch (error) {
+        status.textContent = 'Unable to get the current warehouse address. Check that the warehouse launcher is running, then retry.';
+        retry.hidden = false;
+      } finally {
+        busy = false;
+      }
+    }
+    retry.addEventListener('click', connect);
+    connect();
   </script>
 </body>
 </html>
